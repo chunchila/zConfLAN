@@ -197,6 +197,8 @@ resource "azurerm_network_interface" "network_interface_deploy" {
   
 }
 
+
+
 # Generate random text for a unique storage account name
 resource "random_id" "randomId" {
     keepers = {
@@ -302,9 +304,6 @@ resource "azurerm_virtual_machine" "virtual_machine_deploy" {
 #   }
   
 
-
-   
-
 #    provisioner "local-exec" {
 #     command = "sleep 30"
 #     #interpreter = ["perl", "-e"]
@@ -312,6 +311,49 @@ resource "azurerm_virtual_machine" "virtual_machine_deploy" {
 
 }
    
+
+
+
+provisioner "remote-exec" {
+    inline = [
+      "wget -qO- https://binaries.cockroachdb.com/cockroach-v19.1.3.linux-amd64.tgz | tar  xvz",
+      "cp -i cockroach-v19.1.3.linux-amd64/cockroach /usr/local/bin",
+      "cockroach start --insecure --listen-addr=0.0.0.0 --background",
+    ]
+    connection {
+    user     = "azureuser"
+    host        = "${element(azurerm_public_ip.public_ip_deploy.*.ip_address,count.index)}"
+    # password     = "Roman-12345678!"
+    private_key = "${file("~/.ssh/id_rsa")}"
+    agent       = false
+    timeout     = "10m"
+    }    
+}
+
+// Installing Cockroch Nodes
+resource "null_resource" "install_cockroch_Nodes" {
+count                        = "${(var.vms)-1}"
+
+// Installing cockroch Master
+provisioner "remote-exec" {
+    inline = [
+      "wget -qO- https://binaries.cockroachdb.com/cockroach-v19.1.3.linux-amd64.tgz | tar  xvz",
+      "cp -i cockroach-v19.1.3.linux-amd64/cockroach /usr/local/bin",
+      "cockroach start --insecure --store=node-${var.vms+1} --listen-addr=0.0.0.0 --join=${element(azurerm_network_interface.network_interface_deploy.*.ip_address,0)}:26257 --background",
+    ]
+    connection {
+    user     = "azureuser"
+    host        = "${element(azurerm_public_ip.public_ip_deploy.*.ip_address,count.index + 1)}"
+    # password     = "Roman-12345678!"
+    private_key = "${file("~/.ssh/id_rsa")}"
+    agent       = false
+    timeout     = "10m"
+    }    
+}
+
+
+   
 output "public_ip" {
   value = "${azurerm_public_ip.public_ip_deploy.*.ip_address}"
+}
 }
