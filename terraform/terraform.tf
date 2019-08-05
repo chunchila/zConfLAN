@@ -326,6 +326,7 @@ provisioner "remote-exec" {
       "sudo wget -qO- https://binaries.cockroachdb.com/cockroach-v19.1.3.linux-amd64.tgz | tar  xvz",
       "sudo cp -rf cockroach-v19.1.3.linux-amd64/cockroach /usr/local/bin",
       "sudo killall cockroach",
+      "sudo rm -rf cockroach-data",
       "sudo cockroach start --insecure --advertise-host=${element(azurerm_network_interface.network_interface_deploy.*.private_ip_address,0)}  --background",
     ]
     connection {
@@ -344,6 +345,7 @@ provisioner "remote-exec" {
       "sudo wget -qO- https://binaries.cockroachdb.com/cockroach-v19.1.3.linux-amd64.tgz | tar  xvz",
       "sudo cp -rf cockroach-v19.1.3.linux-amd64/cockroach /usr/local/bin",
       "sudo killall cockroach",
+      "sudo rm -rf cockroach-data",
       "sudo cockroach start --insecure --advertise-host=${element(azurerm_network_interface.network_interface_deploy.*.private_ip_address,1)}  --join=${element(azurerm_network_interface.network_interface_deploy.*.private_ip_address,0)}:26257 --background",
     ]
     connection {
@@ -362,6 +364,7 @@ provisioner "remote-exec" {
       "sudo wget -qO- https://binaries.cockroachdb.com/cockroach-v19.1.3.linux-amd64.tgz | tar  xvz",
       "sudo cp -rf cockroach-v19.1.3.linux-amd64/cockroach /usr/local/bin",
       "sudo killall cockroach",
+      "sudo rm -rf cockroach-data",
       "sudo cockroach start --insecure  --advertise-host=${element(azurerm_network_interface.network_interface_deploy.*.private_ip_address,2)}  --join=${element(azurerm_network_interface.network_interface_deploy.*.private_ip_address,0)}:26257 --background",
     ]
     connection {
@@ -380,6 +383,7 @@ provisioner "remote-exec" {
       "sudo wget -qO- https://binaries.cockroachdb.com/cockroach-v19.1.3.linux-amd64.tgz | tar  xvz",
       "sudo cp -rf cockroach-v19.1.3.linux-amd64/cockroach /usr/local/bin",
       "sudo killall cockroach",
+      "sudo rm -rf cockroach-data",
       "sudo cockroach start --insecure  --advertise-host=${element(azurerm_network_interface.network_interface_deploy.*.private_ip_address,3)}  --join=${element(azurerm_network_interface.network_interface_deploy.*.private_ip_address,0)}:26257 --background",
     ]
     connection {
