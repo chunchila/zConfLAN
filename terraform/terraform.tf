@@ -283,25 +283,25 @@ resource "azurerm_virtual_machine" "virtual_machine_deploy" {
     }
 
 
-#   provisioner "remote-exec" {
+  provisioner "remote-exec" {
     
-#     inline = [
-#       "sudo apt-get install tmux htop -y",
-#       "ls /etc",
-#       "echo roman ",
-#     ]
+    inline = [
+      "sudo apt-get install tmux htop -y",
+      "ls /etc",
+      "echo roman ",
+    ]
 
-#     connection {
-#     user     = "azureuser"
-#     host        = "${element(azurerm_public_ip.public_ip_deploy.*.ip_address,count.index)}"
-#     //password     = "Roman-12345678!"
-#     private_key = "${file("~/.ssh/id_rsa")}"
-#     agent       = false
-#     timeout     = "60s"
+    connection {
+    user     = "azureuser"
+    host        = "${element(azurerm_public_ip.public_ip_deploy.*.ip_address,count.index)}"
+    //password     = "Roman-12345678!"
+    private_key = "${file("~/.ssh/id_rsa")}"
+    agent       = false
+    timeout     = "10m"
 
-#     }
+    }
 
-#   }
+  }
   
 
 #    provisioner "local-exec" {
@@ -315,6 +315,7 @@ resource "azurerm_virtual_machine" "virtual_machine_deploy" {
 
 
 provisioner "remote-exec" {
+    
     inline = [
       "wget -qO- https://binaries.cockroachdb.com/cockroach-v19.1.3.linux-amd64.tgz | tar  xvz",
       "cp -i cockroach-v19.1.3.linux-amd64/cockroach /usr/local/bin",
@@ -330,26 +331,86 @@ provisioner "remote-exec" {
     }    
 }
 
-// Installing Cockroch Nodes
-resource "null_resource" "install_cockroch_Nodes" {
-count                        = "${(var.vms)-1}"
+// Installing Cockroch Cluster
+resource "null_resource" "install_cockroch_Cluster" {
+triggers {
+        build_number = "${timestamp()}"
+    }
 
-// Installing cockroch Master
+// Install Master
 provisioner "remote-exec" {
     inline = [
-      "wget -qO- https://binaries.cockroachdb.com/cockroach-v19.1.3.linux-amd64.tgz | tar  xvz",
-      "cp -i cockroach-v19.1.3.linux-amd64/cockroach /usr/local/bin",
-      "cockroach start --insecure --store=node-${var.vms+1} --listen-addr=0.0.0.0 --join=${element(azurerm_network_interface.network_interface_deploy.*.ip_address,0)}:26257 --background",
+      "sudo wget -qO- https://binaries.cockroachdb.com/cockroach-v19.1.3.linux-amd64.tgz | tar  xvz",
+      "sudo cp -i cockroach-v19.1.3.linux-amd64/cockroach /usr/local/bin",
+      "sudo killall cockroach",
+      "sudo cockroach start --insecure --listen-addr=0.0.0.0  --background",
     ]
     connection {
     user     = "azureuser"
-    host        = "${element(azurerm_public_ip.public_ip_deploy.*.ip_address,count.index + 1)}"
+    host        = "${element(azurerm_public_ip.public_ip_deploy.*.ip_address,0)}"
     # password     = "Roman-12345678!"
     private_key = "${file("~/.ssh/id_rsa")}"
     agent       = false
     timeout     = "10m"
     }    
 }
+
+// Install Node1
+provisioner "remote-exec" {
+    inline = [
+      "sudo wget -qO- https://binaries.cockroachdb.com/cockroach-v19.1.3.linux-amd64.tgz | tar  xvz",
+      "sudo cp -i cockroach-v19.1.3.linux-amd64/cockroach /usr/local/bin",
+      "sudo killall cockroach",
+      "sudo cockroach start --insecure --store=node1 --listen-addr=0.0.0.0 --join=${element(azurerm_network_interface.network_interface_deploy.*.ip_address,0)}:26257 --background",
+    ]
+    connection {
+    user     = "azureuser"
+    host        = "${element(azurerm_public_ip.public_ip_deploy.*.ip_address,1)}"
+    # password     = "Roman-12345678!"
+    private_key = "${file("~/.ssh/id_rsa")}"
+    agent       = false
+    timeout     = "10m"
+    }    
+}
+
+// Install Node2
+provisioner "remote-exec" {
+    inline = [
+      "sudo wget -qO- https://binaries.cockroachdb.com/cockroach-v19.1.3.linux-amd64.tgz | tar  xvz",
+      "sudo cp -i cockroach-v19.1.3.linux-amd64/cockroach /usr/local/bin",
+      "sudo killall cockroach",
+      "sudo cockroach start --insecure --store=node2 --listen-addr=0.0.0.0 --join=${element(azurerm_network_interface.network_interface_deploy.*.ip_address,0)}:26257 --background",
+    ]
+    connection {
+    user     = "azureuser"
+    host        = "${element(azurerm_public_ip.public_ip_deploy.*.ip_address,2)}"
+    # password     = "Roman-12345678!"
+    private_key = "${file("~/.ssh/id_rsa")}"
+    agent       = false
+    timeout     = "10m"
+    }    
+}
+
+// Install Node3
+provisioner "remote-exec" {
+    inline = [
+      "sudo wget -qO- https://binaries.cockroachdb.com/cockroach-v19.1.3.linux-amd64.tgz | tar  xvz",
+      "sudo cp -i cockroach-v19.1.3.linux-amd64/cockroach /usr/local/bin",
+      "sudo killall cockroach",
+      "sudo cockroach start --insecure --store=node3 --listen-addr=0.0.0.0 --join=${element(azurerm_network_interface.network_interface_deploy.*.ip_address,0)}:26257 --background",
+    ]
+    connection {
+    user     = "azureuser"
+    host        = "${element(azurerm_public_ip.public_ip_deploy.*.ip_address,3)}"
+    # password     = "Roman-12345678!"
+    private_key = "${file("~/.ssh/id_rsa")}"
+    agent       = false
+    timeout     = "10m"
+    }    
+}
+
+
+
 
 
    
