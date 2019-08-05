@@ -91,6 +91,31 @@ resource "azurerm_network_security_group" "network_security_group_deploy" {
         destination_address_prefix = "*"
     }
 
+    security_rule {
+        name                       = "8080"
+        priority                   = 1002
+        direction                  = "Inbound"
+        access                     = "Allow"
+        protocol                   = "Tcp"
+        source_port_range          = "*"
+        destination_port_range     = "8080"
+        source_address_prefix      = "*"
+        destination_address_prefix = "*"
+    }
+
+    security_rule {
+        name                       = "26257"
+        priority                   = 1003
+        direction                  = "Inbound"
+        access                     = "Allow"
+        protocol                   = "Tcp"
+        source_port_range          = "*"
+        destination_port_range     = "26257"
+        source_address_prefix      = "*"
+        destination_address_prefix = "*"
+    }
+
+
     
 }
 
@@ -280,44 +305,12 @@ resource "azurerm_virtual_machine" "virtual_machine_deploy" {
 
    
 
-   provisioner "local-exec" {
-    command = "sleep 30"
-    #interpreter = ["perl", "-e"]
-  }
+#    provisioner "local-exec" {
+#     command = "sleep 30"
+#     #interpreter = ["perl", "-e"]
+#   }
 
 }
-
-
-resource "null_resource" "after_install" {
-count                        = "${var.vms}"
-
-provisioner "file" {
-    source      = "main.go"
-    destination = "/tmp/main.go"
-  }
-
-
-provisioner "remote-exec" {
-    
-    inline = [
-      "sudo apt-get install tmux htop -y",
-      "ls /etc",
-      "echo roman ",
-    ]
-
-    connection {
-    user     = "azureuser"
-    host        = "${element(azurerm_public_ip.public_ip_deploy.*.ip_address,count.index)}"
-    //password     = "Roman-12345678!"
-    private_key = "${file("~/.ssh/id_rsa")}"
-    agent       = true
-    timeout     = "60s"
-
-    }
-}
-}
-
-
    
 output "public_ip" {
   value = "${azurerm_public_ip.public_ip_deploy.*.ip_address}"
