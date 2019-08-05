@@ -283,6 +283,7 @@ resource "azurerm_virtual_machine" "virtual_machine_deploy" {
     }
 
 
+
   provisioner "remote-exec" {
     
     inline = [
@@ -299,9 +300,10 @@ resource "azurerm_virtual_machine" "virtual_machine_deploy" {
     agent       = false
     timeout     = "10m"
 
+    } 
     }
 
-  }
+  
   
 
 #    provisioner "local-exec" {
@@ -310,30 +312,11 @@ resource "azurerm_virtual_machine" "virtual_machine_deploy" {
 #   }
 
 }
-   
 
-
-
-provisioner "remote-exec" {
-    
-    inline = [
-      "wget -qO- https://binaries.cockroachdb.com/cockroach-v19.1.3.linux-amd64.tgz | tar  xvz",
-      "cp -i cockroach-v19.1.3.linux-amd64/cockroach /usr/local/bin",
-      "cockroach start --insecure --listen-addr=0.0.0.0 --background",
-    ]
-    connection {
-    user     = "azureuser"
-    host        = "${element(azurerm_public_ip.public_ip_deploy.*.ip_address,count.index)}"
-    # password     = "Roman-12345678!"
-    private_key = "${file("~/.ssh/id_rsa")}"
-    agent       = false
-    timeout     = "10m"
-    }    
-}
 
 // Installing Cockroch Cluster
 resource "null_resource" "install_cockroch_Cluster" {
-triggers {
+triggers ={
         build_number = "${timestamp()}"
     }
 
@@ -341,9 +324,9 @@ triggers {
 provisioner "remote-exec" {
     inline = [
       "sudo wget -qO- https://binaries.cockroachdb.com/cockroach-v19.1.3.linux-amd64.tgz | tar  xvz",
-      "sudo cp -i cockroach-v19.1.3.linux-amd64/cockroach /usr/local/bin",
+      "sudo cp -rf cockroach-v19.1.3.linux-amd64/cockroach /usr/local/bin",
       "sudo killall cockroach",
-      "sudo cockroach start --insecure --listen-addr=0.0.0.0  --background",
+      "sudo cockroach start --insecure --advertise-host=${element(azurerm_network_interface.network_interface_deploy.*.private_ip_address,0)}  --background",
     ]
     connection {
     user     = "azureuser"
@@ -359,9 +342,9 @@ provisioner "remote-exec" {
 provisioner "remote-exec" {
     inline = [
       "sudo wget -qO- https://binaries.cockroachdb.com/cockroach-v19.1.3.linux-amd64.tgz | tar  xvz",
-      "sudo cp -i cockroach-v19.1.3.linux-amd64/cockroach /usr/local/bin",
+      "sudo cp -rf cockroach-v19.1.3.linux-amd64/cockroach /usr/local/bin",
       "sudo killall cockroach",
-      "sudo cockroach start --insecure --store=node1 --listen-addr=0.0.0.0 --join=${element(azurerm_network_interface.network_interface_deploy.*.ip_address,0)}:26257 --background",
+      "sudo cockroach start --insecure --advertise-host=${element(azurerm_network_interface.network_interface_deploy.*.private_ip_address,1)}  --join=${element(azurerm_network_interface.network_interface_deploy.*.private_ip_address,0)}:26257 --background",
     ]
     connection {
     user     = "azureuser"
@@ -377,9 +360,9 @@ provisioner "remote-exec" {
 provisioner "remote-exec" {
     inline = [
       "sudo wget -qO- https://binaries.cockroachdb.com/cockroach-v19.1.3.linux-amd64.tgz | tar  xvz",
-      "sudo cp -i cockroach-v19.1.3.linux-amd64/cockroach /usr/local/bin",
+      "sudo cp -rf cockroach-v19.1.3.linux-amd64/cockroach /usr/local/bin",
       "sudo killall cockroach",
-      "sudo cockroach start --insecure --store=node2 --listen-addr=0.0.0.0 --join=${element(azurerm_network_interface.network_interface_deploy.*.ip_address,0)}:26257 --background",
+      "sudo cockroach start --insecure  --advertise-host=${element(azurerm_network_interface.network_interface_deploy.*.private_ip_address,2)}  --join=${element(azurerm_network_interface.network_interface_deploy.*.private_ip_address,0)}:26257 --background",
     ]
     connection {
     user     = "azureuser"
@@ -395,9 +378,9 @@ provisioner "remote-exec" {
 provisioner "remote-exec" {
     inline = [
       "sudo wget -qO- https://binaries.cockroachdb.com/cockroach-v19.1.3.linux-amd64.tgz | tar  xvz",
-      "sudo cp -i cockroach-v19.1.3.linux-amd64/cockroach /usr/local/bin",
+      "sudo cp -rf cockroach-v19.1.3.linux-amd64/cockroach /usr/local/bin",
       "sudo killall cockroach",
-      "sudo cockroach start --insecure --store=node3 --listen-addr=0.0.0.0 --join=${element(azurerm_network_interface.network_interface_deploy.*.ip_address,0)}:26257 --background",
+      "sudo cockroach start --insecure  --advertise-host=${element(azurerm_network_interface.network_interface_deploy.*.private_ip_address,3)}  --join=${element(azurerm_network_interface.network_interface_deploy.*.private_ip_address,0)}:26257 --background",
     ]
     connection {
     user     = "azureuser"
@@ -408,7 +391,7 @@ provisioner "remote-exec" {
     timeout     = "10m"
     }    
 }
-
+}
 
 
 
@@ -416,5 +399,4 @@ provisioner "remote-exec" {
    
 output "public_ip" {
   value = "${azurerm_public_ip.public_ip_deploy.*.ip_address}"
-}
 }
