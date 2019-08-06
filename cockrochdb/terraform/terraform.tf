@@ -8,7 +8,7 @@ provider "azurerm" {
 
 
 variable "vms" {
-    default = 4
+    default = 5
   
 }
 
@@ -56,7 +56,7 @@ resource "azurerm_public_ip" "public_ip_deploy" {
     name                         = "public_ip_deploy-${count.index}"
     location                     = "eastus"
     resource_group_name          = "${azurerm_resource_group.resource_group_deploy.name}"
-    allocation_method = "Dynamic"
+    allocation_method = "Static"
 
    
 }
@@ -273,7 +273,7 @@ resource "azurerm_virtual_machine" "virtual_machine_deploy" {
         
         ssh_keys {
             path     = "/home/azureuser/.ssh/authorized_keys"
-            key_data = "${file("~/.ssh/id_rsa")}"
+            key_data = "${file("~/.ssh/id_rsa.pub")}"
         }
     }
 
@@ -284,28 +284,24 @@ resource "azurerm_virtual_machine" "virtual_machine_deploy" {
 
 
 
-  provisioner "remote-exec" {
+#   provisioner "remote-exec" {
     
-    inline = [
-      "sudo apt-get install tmux htop -y",
-      "ls /etc",
-      "echo roman ",
-    ]
+#     inline = [
+#       "sudo apt-get install tmux htop -y",
+#       "ls /etc",
+#       "echo roman ",
+#     ]
 
-    connection {
-    user     = "azureuser"
-    host        = "${element(azurerm_public_ip.public_ip_deploy.*.ip_address,count.index)}"
-    //password     = "Roman-12345678!"
-    private_key = "${file("~/.ssh/id_rsa")}"
-    agent       = false
-    timeout     = "10m"
+#         connection {
+#         user     = "azureuser"
+#         host        = "${element(azurerm_public_ip.public_ip_deploy.*.ip_address,count.index)}"
+#         //password     = "Roman-12345678!"
+#         private_key = "${file("~/.ssh/id_rsa")}"
+#         agent       = false
+#         timeout     = "10m"
 
-    } 
-    }
-
-  
-  
-
+#         } 
+#     }
 #    provisioner "local-exec" {
 #     command = "sleep 30"
 #     #interpreter = ["perl", "-e"]
@@ -316,6 +312,10 @@ resource "azurerm_virtual_machine" "virtual_machine_deploy" {
 
 // Installing Cockroch Cluster
 resource "null_resource" "install_cockroch_Cluster" {
+
+depends_on = ["azurerm_virtual_machine.virtual_machine_deploy"]
+
+
 triggers ={
         build_number = "${timestamp()}"
     }
@@ -328,6 +328,9 @@ provisioner "remote-exec" {
       "sudo killall cockroach",
       "sudo rm -rf cockroach-data",
       "sudo cockroach start --insecure --advertise-host=${element(azurerm_network_interface.network_interface_deploy.*.private_ip_address,0)}  --background",
+    #   "sudo cockroach sql --insecure --execute \"CREATE USER IF NOT EXISTS maxroach\\;\" ",
+    #   "sudo cockroach sql --insecure --execute \"CREATE DATABASE bank\\;\" ",
+    #   "sudo cockroach sql --insecure --execute \"GRANT ALL ON DATABASE bank TO maxroach\\;\" ",
     ]
     connection {
     user     = "azureuser"
