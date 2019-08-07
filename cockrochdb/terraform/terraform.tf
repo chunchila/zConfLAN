@@ -8,7 +8,7 @@ provider "azurerm" {
 
 
 variable "vms" {
-    default = 10
+    default = 7
   
 }
 
@@ -444,7 +444,7 @@ provisioner "remote-exec" {
       "sudo cp -rf cockroach-v19.1.3.linux-amd64/cockroach /usr/local/bin",
       "sudo killall cockroach",
       "sudo rm -rf cockroach-data",
-      "sudo cockroach start --insecure  --advertise-host=${element(azurerm_network_interface.network_interface_deploy.*.private_ip_address,6)}  --join=${element(azurerm_network_interface.network_interface_deploy.*.private_ip_address,0)}:26257 --background",
+    #   "sudo cockroach start --insecure  --advertise-host=${element(azurerm_network_interface.network_interface_deploy.*.private_ip_address,6)}  --join=${element(azurerm_network_interface.network_interface_deploy.*.private_ip_address,0)}:26257 --background",
     ]
     connection {
     user     = "azureuser"
@@ -455,87 +455,6 @@ provisioner "remote-exec" {
     timeout     = "10m"
     }    
 }
-
-// Install Node7
-provisioner "remote-exec" {
-    inline = [
-      "sudo wget -qO- https://binaries.cockroachdb.com/cockroach-v19.1.3.linux-amd64.tgz | tar  xvz",
-      "sudo cp -rf cockroach-v19.1.3.linux-amd64/cockroach /usr/local/bin",
-      "sudo killall cockroach",
-      "sudo rm -rf cockroach-data",
-      "sudo cockroach start --insecure  --advertise-host=${element(azurerm_network_interface.network_interface_deploy.*.private_ip_address,7)}  --join=${element(azurerm_network_interface.network_interface_deploy.*.private_ip_address,0)}:26257 --background",
-    ]
-    connection {
-    user     = "azureuser"
-    host        = "${element(azurerm_public_ip.public_ip_deploy.*.ip_address,7)}"
-    # password     = "Roman-12345678!"
-    private_key = "${file("~/.ssh/id_rsa")}"
-    agent       = false
-    timeout     = "10m"
-    }    
-}
-
-// Install Node8
-provisioner "remote-exec" {
-    inline = [
-      "sudo wget -qO- https://binaries.cockroachdb.com/cockroach-v19.1.3.linux-amd64.tgz | tar  xvz",
-      "sudo cp -rf cockroach-v19.1.3.linux-amd64/cockroach /usr/local/bin",
-      "sudo killall cockroach",
-      "sudo rm -rf cockroach-data",
-      "sudo cockroach start --insecure  --advertise-host=${element(azurerm_network_interface.network_interface_deploy.*.private_ip_address,8)}  --join=${element(azurerm_network_interface.network_interface_deploy.*.private_ip_address,0)}:26257 --background",
-    ]
-    connection {
-    user     = "azureuser"
-    host        = "${element(azurerm_public_ip.public_ip_deploy.*.ip_address,8)}"
-    # password     = "Roman-12345678!"
-    private_key = "${file("~/.ssh/id_rsa")}"
-    agent       = false
-    timeout     = "10m"
-    }    
-}
-
-// Install Node9
-provisioner "remote-exec" {
-    inline = [
-      "sudo wget -qO- https://binaries.cockroachdb.com/cockroach-v19.1.3.linux-amd64.tgz | tar  xvz",
-      "sudo cp -rf cockroach-v19.1.3.linux-amd64/cockroach /usr/local/bin",
-      "sudo killall cockroach",
-      "sudo rm -rf cockroach-data",
-      "sudo cockroach start --insecure  --advertise-host=${element(azurerm_network_interface.network_interface_deploy.*.private_ip_address,9)}  --join=${element(azurerm_network_interface.network_interface_deploy.*.private_ip_address,0)}:26257 --background",
-    ]
-    connection {
-    user     = "azureuser"
-    host        = "${element(azurerm_public_ip.public_ip_deploy.*.ip_address,9)}"
-    # password     = "Roman-12345678!"
-    private_key = "${file("~/.ssh/id_rsa")}"
-    agent       = false
-    timeout     = "10m"
-    }    
-}
-
-// Install Node10
-provisioner "remote-exec" {
-    inline = [
-      "sudo wget -qO- https://binaries.cockroachdb.com/cockroach-v19.1.3.linux-amd64.tgz | tar  xvz",
-      "sudo cp -rf cockroach-v19.1.3.linux-amd64/cockroach /usr/local/bin",
-      "sudo killall cockroach",
-      "sudo rm -rf cockroach-data",
-      "sudo apt-get install haproxy -y ",
-      "sudo cockroach gen haproxy --insecure --host=${element(azurerm_network_interface.network_interface_deploy.*.private_ip_address,0)} --port=26257",
-      "killall haproxy",
-      "sudo haproxy -f haproxy.cfg &",
-    #   "sudo cockroach start --insecure  --advertise-host=${element(azurerm_network_interface.network_interface_deploy.*.private_ip_address,3)}  --join=${element(azurerm_network_interface.network_interface_deploy.*.private_ip_address,0)}:26257 --background",
-    ]
-    connection {
-    user     = "azureuser"
-    host        = "${element(azurerm_public_ip.public_ip_deploy.*.ip_address,10)}"
-    # password     = "Roman-12345678!"
-    private_key = "${file("~/.ssh/id_rsa")}"
-    agent       = false
-    timeout     = "10m"
-    }    
-}
-
 
 
 
