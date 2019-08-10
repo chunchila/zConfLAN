@@ -8,7 +8,7 @@ provider "azurerm" {
 
 
 variable "vms" {
-    default = 7
+    default = 4
   
 }
 
@@ -318,7 +318,9 @@ resource "azurerm_virtual_machine" "virtual_machine_deploy" {
 
 
 // Installing Cockroch Cluster
-resource "null_resource" "install_cockroch_Cluster" {
+resource "null_resource" "install_openshift" {
+    count                 = "${var.vms}" 
+
 
 depends_on = ["azurerm_virtual_machine.virtual_machine_deploy"]
 
@@ -331,7 +333,7 @@ triggers ={
 provisioner "remote-exec" {
     inline = [
     #   "sudo wget -qO- https://binaries.cockroachdb.com/cockroach-v19.1.3.linux-amd64.tgz | tar  xvz",
-      "sudo yum update -y",
+      "ls ",
       
     ]
     connection {
