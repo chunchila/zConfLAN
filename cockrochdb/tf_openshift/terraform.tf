@@ -239,7 +239,7 @@ resource "azurerm_virtual_machine" "virtual_machine_deploy" {
     location              = "eastus"
     resource_group_name   = "${azurerm_resource_group.resource_group_deploy.name}"
     network_interface_ids = ["${element(azurerm_network_interface.network_interface_deploy.*.id,count.index)}"]
-    vm_size               = "Standard_DS1_v2"
+    vm_size               = "Standard_DS3_v2"
     delete_data_disks_on_termination = true
     delete_os_disk_on_termination  =true
     # availability_set_id   = "${azurerm_availability_set.availability_set_deploy.id}"
@@ -256,7 +256,7 @@ resource "azurerm_virtual_machine" "virtual_machine_deploy" {
     storage_image_reference {
         publisher = "openlogic"
         offer     = "CentOS"
-        sku       = "7.5"
+        sku       = "7.6"
         version   = "latest"
     }
 
@@ -304,7 +304,7 @@ resource "azurerm_virtual_machine" "virtual_machine_deploy" {
 #         host        = "${element(azurerm_public_ip.public_ip_deploy.*.ip_address,count.index)}"
 #         //password     = "Roman-12345678!"
 #         private_key = "${file("~/.ssh/id_rsa")}"
-#         agent       = false
+#         agent       = true
 #         timeout     = "10m"
 
 #         } 
@@ -331,120 +331,19 @@ triggers ={
 provisioner "remote-exec" {
     inline = [
     #   "sudo wget -qO- https://binaries.cockroachdb.com/cockroach-v19.1.3.linux-amd64.tgz | tar  xvz",
-      "sudo yum update ",
-      "sudo yum upgrade -y ",
+      "sudo yum update -y",
+      
     ]
     connection {
     user     = "azureuser"
-    host        = "${element(azurerm_public_ip.public_ip_deploy.*.ip_address,0)}"
+    host        = "${element(azurerm_public_ip.public_ip_deploy.*.ip_address,count.index)}"
     # password     = "Roman-12345678!"
     private_key = "${file("~/.ssh/id_rsa")}"
-    agent       = false
+    agent       = true
     timeout     = "10m"
     }    
 }
 
-// Install Node1
-provisioner "remote-exec" {
-    inline = [
-    #   "sudo wget -qO- https://binaries.cockroachdb.com/cockroach-v19.1.3.linux-amd64.tgz | tar  xvz",
-      "sudo yum update ",
-      "sudo yum upgrade -y ",
-    ]
-    connection {
-    user     = "azureuser"
-    host        = "${element(azurerm_public_ip.public_ip_deploy.*.ip_address,1)}"
-    # password     = "Roman-12345678!"
-    private_key = "${file("~/.ssh/id_rsa")}"
-    agent       = false
-    timeout     = "10m"
-    }    
-}
-
-// Install Node2
-provisioner "remote-exec" {
-    inline = [
-    #   "sudo wget -qO- https://binaries.cockroachdb.com/cockroach-v19.1.3.linux-amd64.tgz | tar  xvz",
-      "sudo yum update ",
-      "sudo yum upgrade -y ",
-    ]
-    connection {
-    user     = "azureuser"
-    host        = "${element(azurerm_public_ip.public_ip_deploy.*.ip_address,2)}"
-    # password     = "Roman-12345678!"
-    private_key = "${file("~/.ssh/id_rsa")}"
-    agent       = false
-    timeout     = "10m"
-    }    
-}
-
-// Install Node3
-provisioner "remote-exec" {
-    inline = [
-    #   "sudo wget -qO- https://binaries.cockroachdb.com/cockroach-v19.1.3.linux-amd64.tgz | tar  xvz",
-      "sudo yum update ",
-      "sudo yum upgrade -y ",
-    ]
-    connection {
-    user     = "azureuser"
-    host        = "${element(azurerm_public_ip.public_ip_deploy.*.ip_address,3)}"
-    # password     = "Roman-12345678!"
-    private_key = "${file("~/.ssh/id_rsa")}"
-    agent       = false
-    timeout     = "10m"
-    }    
-}
-
-// Install Node4
-provisioner "remote-exec" {
-    inline = [
-    #   "sudo wget -qO- https://binaries.cockroachdb.com/cockroach-v19.1.3.linux-amd64.tgz | tar  xvz",
-      "sudo yum update ",
-      "sudo yum upgrade -y ",
-    ]
-    connection {
-    user     = "azureuser"
-    host        = "${element(azurerm_public_ip.public_ip_deploy.*.ip_address,4)}"
-    # password     = "Roman-12345678!"
-    private_key = "${file("~/.ssh/id_rsa")}"
-    agent       = false
-    timeout     = "10m"
-    }    
-}
-
-// Install Node5
-provisioner "remote-exec" {
-    inline = [
-    #   "sudo wget -qO- https://binaries.cockroachdb.com/cockroach-v19.1.3.linux-amd64.tgz | tar  xvz",
-      "sudo yum update ",
-      "sudo yum upgrade -y ",
-    ]
-    connection {
-    user     = "azureuser"
-    host        = "${element(azurerm_public_ip.public_ip_deploy.*.ip_address,5)}"
-    # password     = "Roman-12345678!"
-    private_key = "${file("~/.ssh/id_rsa")}"
-    agent       = false
-    timeout     = "10m"
-    }    
-}
-
-// Install Node6
-provisioner "remote-exec" {
-    inline = [
-    #   "sudo wget -qO- https://binaries.cockroachdb.com/cockroach-v19.1.3.linux-amd64.tgz | tar  xvz",
-      "sudo yum update ",
-      "sudo yum upgrade -y ",
-    ]
-    connection {
-    user     = "azureuser"
-    host        = "${element(azurerm_public_ip.public_ip_deploy.*.ip_address,6)}"
-    # password     = "Roman-12345678!"
-    private_key = "${file("~/.ssh/id_rsa")}"
-    agent       = false
-    timeout     = "10m"
-    }    
-}
 
 
 
